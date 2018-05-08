@@ -1,50 +1,15 @@
-![cf](https://i.imgur.com/7v5ASc8.png) Lab 16: Basic Authentication
-======
+The following npm install should occur before attempting to run this application:
 
-## Submission Instructions
-* Work in a fork of this repository
-* Work in a branch on your fork
-* Open a pull request to this repository
-* Submit on canvas a question and observation, how long you spent, and a link to your pull request
+[npm install -D babel-register babel-preset-env babel-eslint eslint eslint-config-airbnb-base eslint-plugin-import eslint-plugin-jest jest]
 
-## Resources
-* [express docs](http://expressjs.com/en/4x/api.html)
-* [mongoose guide](http://mongoosejs.com/docs/guide.html)
-* [mongoose api docs](http://mongoosejs.com/docs/api.html)
+Also, install these packages before running the application:
 
-### Configuration
-Configure the root of your repository with the following files and directories. Thoughtfully name and organize any additional configuration or module files.
-* **README.md** - contains documentation
-* **.env** - contains env variables **(should be git ignored)**
-* **.gitignore** - contains a [robust](http://gitignore.io) `.gitignore` file
-* **.eslintrc.json** - contains the course linter configuration
-* **.eslintignore** - contains the course linter ignore configuration
-* **package.json** - contains npm package config
-  * create a `test` script for running tests
-  * create `dbon` and `dboff` scripts for managing the mongo daemon
-* **db/** - contains mongodb files **(should be git ignored)**
-* **index.js** - entry-point of the application
-* **src/** - contains the remaining code
-  * **src/lib/** - contains module definitions
-  * **src/model/** - contains module definitions
-  * **src/route/** - contains module definitions
-  * **src/\_\_test\_\_/** - contains test modules
-  * **main.js** - starts the server
+[npm i winston@next dotenv faker]
 
-## Feature Tasks  
-For this assignment you will be building a RESTful HTTP server with basic authentication using express.
+Install Mongodb and start your mongodb server before running the application.
 
-#### Account
-Create a user `Account` model that keeps track of a username, email, hashed password, and token seed. The model should be able to regenerate tokens using json web token. 
+How to start server: start the server via the startServer() function from the server.js file. This will allow us to connect to our mongodb (process.env.MONGODB_URI). Mongoose acts as the middleware that connects us from our computer to the mongodb.
 
-#### Server Endpoints
-* `POST /signup` 
-  * pass data as stringifed JSON in the body of a **POST** request to create a new account
-  * on success respond with a 200 status code and an authentication token
-  * on failure due to a bad request send a 400 status code
+how to make requests to each endpoint:
 
-## Tests
-* POST should test for 200, 400, and 409 (if any keys are unique)
-
-## Documentation
-In the README.md write documentation for starting your server and making requests to each endpoint it provides. The documentation should describe how the server would respond to valid and invalid requests.
+authRouter.post() is how a user submits a post request.  Upon a successful post request, a new Account for the user will be created.  The new Account consists of the username, email and password, also a unique token will be generated.  That token is essentially the id for the user's account.  If there is no database available to receive the new data we've attempted to send or a bad json request occurred, the server will display a 400 error and error message will read 'Responding with a 400 error code.' If a post request occurs and an instance of that post already exists, a 409 duplicate key error message will display. If the new data is posted successfully to mongodb the server will display a 200 message and the message will read 'POST - responding with a 200 status code'.
