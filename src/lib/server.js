@@ -4,6 +4,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import logger from './logger';
 import authRoutes from '../route/auth-router';
+import profileRoutes from '../route/profile-route';
 import loggerMiddleware from './logger-middleware';
 import errorMiddleware from './error-middleware';
 
@@ -15,6 +16,7 @@ let server = null;
 // (1) link in the chain
 app.use(loggerMiddleware); // Zachary - using an app level middleware
 app.use(authRoutes);
+app.use(profileRoutes);
 //---------------------------------------------------------------------------------
 // (2) link in the chain
 // Zachary - manking sure I return a 404 status if I don't have a matching route
