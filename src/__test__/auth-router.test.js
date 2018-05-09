@@ -33,14 +33,12 @@ describe('AUTH ROUTER', () => {
       })
       .then(Promise.reject)
       .catch((error) => {
-        console.log(error);
         expect(error.status).toEqual(400);
       });
   });
   test('409 due to duplicate videoconsole', () => {
     return pCreateAccountMock()
       .then((account) => {
-        console.log('HEY LOOK AT MEL;KDSJFGOJDFKLGJSDLGJSFLGKJ', account); 
         const mockAccount = {
           username: account.request.username,
           password: account.request.password,
@@ -53,7 +51,6 @@ describe('AUTH ROUTER', () => {
         Promise.reject(response);
       })
       .catch((err) => {
-        console.log(err);
         expect(err.status).toEqual(409);
       });
   });
