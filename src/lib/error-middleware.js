@@ -8,7 +8,7 @@ export default (error, request, response, next) => { // eslint-disable-line no-u
   // Zachary - I know I might have the property error.status
 
   if (error.status) {
-    if ( error.message.toLowerCase().includes('jwt malformed')) {
+    if (error.message.toLowerCase().includes('jwt malformed')) {
       return response.sendStatus(401);
     }
     logger.log(logger.INFO, `Responding with a ${error.status} code and message ${error.message}`);

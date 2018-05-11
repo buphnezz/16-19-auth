@@ -1,13 +1,10 @@
 'use strict';
 
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt'; // Zachary - used to generate hash
-import crypto from 'crypto'; // Zachary - used to generate random data
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 import jsonWebToken from 'jsonwebtoken';
-
-// Zachary - CAPS naming conventions apply to strings and numbers
-const HASH_ROUNDS = 8;
-const TOKEN_SEED_LENGTH = 128;
+import HttpError from 'http-errors';
 
 const accountSchema = mongoose.Schema({
   passwordHash: {
@@ -19,55 +16,67 @@ const accountSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   tokenSeed: {
     type: String,
     required: true,
     unique: true,
   },
-  createdOn: {
+  created: {
     type: Date,
     default: () => new Date(),
   },
 });
 
-function pCreateToken() {
-  // Zachary - `this` is equal to the account object we are working with.
-  this.tokenSeed = crypto.randomBytes(TOKEN_SEED_LENGTH).toString('hex');
-  return this.save()
-    .then((account) => {
-      // Zachary - at this point, we have a token seed.
-      // Zachary - sign === encrypt
-      return jsonWebToken.sign(// Zachary this line returns a promise that resolves to token)
-        { tokenSeed: account.tokenSeed },
-        process.env.Z_COOL_SECRET,
-      ); // Zachary - When this promise resolves, I have a token
+const TOKEN_SEED_SIZE = 128;
+const HASH_SALT_ROUNDS = 8;
+
+function verifyPassword(password) {
+  return bcrypt.compare(password, this.passwordHash)
+    .then((result) => {
+      if (!result) {
+        throw new HttpError(401, '__AUTH__ incorrect username or password');
+      }
+      return this;
     });
-  // Zachary - TODO: error management
 }
 
-accountSchema.methods.pCreateToken = pCreateToken;
+function createToken() {
+  this.tokenSeed = crypto.randomBytes(TOKEN_SEED_SIZE).toString('hex');
 
-const Account = mongoose.model('account', accountSchema);
+  return this.save()
+    .then((account) => {
+      // Zachary - here, we know that the tokenSeed is unique
+      return jsonWebToken.sign(
+        { tokenSeed: account.tokenSeed },
+        process.env.Z_COOL_SECRET,
+      );
+    });
+}
 
-/* Hash variable: 
-  - SALT
-  - Hashing algorithm (bcrypt)
-  - password
-  - rounds
-*/
-Account.create = (username, email, password) => {
-  return bcrypt.hash(password, HASH_ROUNDS)
+accountSchema.methods.verifyPassword = verifyPassword;
+accountSchema.methods.createToken = createToken;
+
+const Account = module.exports = mongoose.model('account', accountSchema);
+
+Account.pCreate = (username, email, password) => {
+  // Zachary - TODO : validation checks
+  return bcrypt.hash(password, HASH_SALT_ROUNDS)
     .then((passwordHash) => {
-      // Zachary - we have the password hash
-      password = null; // eslint-disable-line
-      const tokenSeed = crypto.randomBytes(TOKEN_SEED_LENGTH).toString('hex'); // Zachary - hex is used due to HTTP
+      // Zachary - creating a token seed
+      const tokenSeed = crypto.randomBytes(TOKEN_SEED_SIZE).toString('hex');
       return new Account({
-        username,
+        username, // Zachary - same as username : username,
         email,
         passwordHash,
         tokenSeed,
       }).save();
     });
+  // Zachary - password is GONE!
 };
 
-export default Account;
+export default mongoose.model('account', accountSchema);

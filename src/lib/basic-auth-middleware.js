@@ -7,6 +7,7 @@ export default (request, response, next) => {
   if (!request.headers.authorization) {
     return next(new HttpError(400, 'AUTH - invalid request'));
   }
+  
   const base64AuthHeader = request.headers.authorization.split('Basic ')[1];
   if (!base64AuthHeader) {
     return next(new HttpError(400, 'AUTH - invalid request'));

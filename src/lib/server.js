@@ -7,6 +7,7 @@ import authRoutes from '../route/auth-router';
 import profileRoutes from '../route/profile-route';
 import loggerMiddleware from './logger-middleware';
 import errorMiddleware from './error-middleware';
+import dinopicRoutes from '../route/dinopic-router';
 
 const app = express();
 let server = null;
@@ -17,6 +18,7 @@ let server = null;
 app.use(loggerMiddleware); // Zachary - using an app level middleware
 app.use(authRoutes);
 app.use(profileRoutes);
+app.use(dinopicRoutes);
 //---------------------------------------------------------------------------------
 // (2) link in the chain
 // Zachary - manking sure I return a 404 status if I don't have a matching route
@@ -36,15 +38,22 @@ const startServer = () => {
       server = app.listen(process.env.PORT, () => {
         logger.log(logger.INFO, `Server is listening on port ${process.env.PORT}`);
       });
+      return undefined;
+    })
+    .catch((err) => {
+      logger.log(logger.ERROR, `something happened, ${JSON.stringify(err)}`);
     });
 };
 
 const stopServer = () => {
   return mongoose.disconnect()
     .then(() => {
-      server.close(() => {
+      return server.close(() => {
         logger.log(logger.INFO, 'Server is off');
       });
+    })
+    .catch((err) => {
+      return logger.log(logger.ERROR, `something happened, ${JSON.stringify(err)}`);
     });
 };
 

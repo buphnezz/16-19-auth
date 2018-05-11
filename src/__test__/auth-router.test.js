@@ -5,7 +5,7 @@ import { startServer, stopServer } from '../lib/server';
 import { pRemoveAccountMock, pCreateAccountMock } from './lib/account-mock';
 
 
-const apiURL = `http://localhost:${process.env.PORT}/signup`;
+const apiURL = `http://localhost:${process.env.PORT}`;
 
 
 describe('AUTH ROUTER', () => {

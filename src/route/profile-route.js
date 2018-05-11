@@ -18,8 +18,7 @@ profileRouter.post('/profiles', bearerAuthMiddleWare, jsonParser, (request, resp
   return new Profile({
     ...request.body,
     account: request.account._id,
-  })
-    .save()
+  }).save()
     .then((profile) => {
       logger.log(logger.INFO, 'Returning a 200 and a Profile');
       return response.json(profile);
